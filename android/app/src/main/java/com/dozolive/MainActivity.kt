@@ -1,4 +1,4 @@
-package com.dozolive
+package com.uecoentertainment.dozoLive
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

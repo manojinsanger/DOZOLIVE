@@ -1,0 +1,229 @@
+
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  Image,
+
+  StyleSheet,
+  StatusBar,
+} from 'react-native';
+
+import CustomHeader from '@/components/profile/CustomHeader';
+import rulesIcon from '@/assets/images/icon/question.png';
+
+import userIcon from '@/assets/images/icon/user.png';
+import userProfileIcon from '@/assets/images/icon/user-profile.png';
+import detectiveIcon from '@/assets/images/icon/detective.png';
+import policewomanIcon from '@/assets/images/icon/policewoman.png';
+
+import wealthLevelIcon from "@/assets/images/wealthlevel/ic_user_level_1to19.png";
+
+import livestreamlevelBadge from "@/assets/images/livestreamlevel/lv0_bg.png";
+import customColors from '@/constants/styles';
+import { scaleFont, scaleHeight, scaleWidth } from '@/constants/scaling';
+
+
+const mockData = [
+    {
+      id: '4997238',
+      name: 'takshdweeppp',
+      gender: 'Male',
+      level: 'D',
+      hosts: 12,
+      time: '03-21 14:02',
+      image: userIcon,
+      wealthLevel: 1,
+      livestreamLevel: 0,
+    },
+    {
+      id: '12767478',
+      name: '\uD83C\uDF39simple gi',
+      gender: 'Female',
+      level: 'C',
+      hosts: 2,
+      time: '02-25 13:53',
+      image: userProfileIcon,
+      wealthLevel: 1,
+      livestreamLevel: 0,
+    },
+    {
+      id: '13506426',
+      name: '\u2606Mr Surya\uD83D\uDE0E\uD83C\uDDEE\uD83C\uDDF3',
+      gender: 'Male',
+      level: 'D',
+      hosts: 0,
+      time: '01-17 03:13',
+      image: detectiveIcon,
+      wealthLevel: 1,
+      livestreamLevel: 0,
+    },
+    {
+      id: '21855685',
+      name: '@Akshu \uD83C\uDDEE\uD83C\uDDF3 POPP',
+      gender: 'Female',
+      level: 'D',
+      hosts: 7,
+      time: '01-04 02:11',
+      image: policewomanIcon,
+      wealthLevel: 1,
+      livestreamLevel: 0,
+    },
+  ];
+  
+const VisitorsPage = () => {
+
+  const [search, setSearch] = useState('');
+  const [filteredData, setFilteredData] = useState(mockData);
+
+
+  const handleSearch = (text: string) => {
+    setSearch(text);
+    if (text === '') {
+      setFilteredData(mockData);
+    } else {
+      setFilteredData(mockData.filter((user) => user.name.toLowerCase().includes(text.toLowerCase())));
+    }
+  };
+
+
+const renderItem = ({ item }: { item: any }) => {
+
+    const isFemale = item.gender === 'Female';
+
+  
+    return (
+      <View style={styles.itemContainer}>
+        <Image
+          source={item.image}
+          style={styles.avatar}
+          defaultSource={rulesIcon}
+        />
+        <View style={{ flex: 2 }}>
+          <Text style={styles.nameColumn}>{item.name}</Text>
+          <View style={styles.levelRow}>
+            {/* Wealth Level Badge */}
+            <View style={styles.levelBadgeContainer}>
+              <Image source={wealthLevelIcon} style={styles.iconBadge} />
+              <Text style={styles.levelText}>{item.wealthLevel}</Text>
+            </View>
+  
+            {/* Livestream Level Badge */}
+            <View style={styles.levelBadgeContainer}>
+              <Image source={livestreamlevelBadge} style={styles.iconBadge} />
+              <Text style={styles.levelText}>{item.livestreamLevel}</Text>
+            </View>
+          </View>
+          <Text style={styles.idText}>id: {item.id}</Text>
+        </View>
+        <View style={styles.buttonContainer}>
+          <Text>{item.time}</Text>
+        </View>
+      </View>
+    );
+  };
+  return (
+    <View style={styles.container}>
+      <CustomHeader title="Visitors" />
+      <View style={styles.content}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="ID number or nickname"
+          value={search}
+          onChangeText={handleSearch}
+          placeholderTextColor={customColors.textLightTertiary}
+        />
+        <FlatList
+          data={filteredData}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+        />
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: customColors.white,
+    paddingTop: StatusBar.currentHeight,
+  },
+  content: {
+    flex: 1,
+  },
+  searchBar: {
+    padding: scaleWidth(12),
+    margin: scaleWidth(16),
+    borderWidth: 1,
+    borderRadius: scaleWidth(8),
+    borderColor: customColors.textLightTertiary,
+    color: customColors.textLightPrimary,
+    fontSize: scaleFont(14),
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: scaleWidth(12),
+    borderBottomWidth: 1,
+    borderColor: customColors.gray300,
+  },
+  avatar: {
+    width: scaleWidth(40),
+    height: scaleHeight(40),
+    borderRadius: scaleWidth(20),
+    marginRight: scaleWidth(10),
+  },
+  nameColumn: {
+    color: customColors.textLightSecondary,
+    fontSize: scaleFont(15),
+  },
+  idText: {
+    fontSize: scaleFont(12),
+    color: customColors.textLightTertiary,
+    marginTop: 2,
+  },
+  levelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginVertical: 1,
+  },
+
+  buttonContainer: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  genderText: {
+    fontSize: scaleFont(13),
+    color: customColors.textLightSecondary,
+    marginRight: 8,
+  },
+  levelBadgeContainer: {
+    position: 'relative',
+    width: scaleWidth(28),
+    height: scaleHeight(18),
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  iconBadge: {
+    width: scaleWidth(28),
+    height: scaleHeight(18),
+    resizeMode: 'contain',
+    position: 'absolute',
+    zIndex: 5,
+  },
+  levelText: {
+    color: customColors.white,
+    fontWeight: 'bold',
+    fontSize: scaleFont(10),
+    position: 'absolute',
+    zIndex: 10,
+  },
+  
+});
+
+export default VisitorsPage;

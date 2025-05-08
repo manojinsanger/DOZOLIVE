@@ -1,0 +1,8 @@
+export enum TransactionType {
+    RECHARGE = 'RECHARGE',
+    GIFT_TRANSACTION = 'GIFT_TRANSACTION',
+    WITHDRAW = 'WITHDRAW',
+    SEND_TRANSFER = 'SEND_TRANSFER',
+    COMMISSION = 'COMMISSION',
+  }
+  

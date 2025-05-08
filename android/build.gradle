@@ -1,21 +1,31 @@
 buildscript {
     ext {
         buildToolsVersion = "35.0.0"
-        minSdkVersion = 24
+        minSdkVersion = 26
         compileSdkVersion = 35
         targetSdkVersion = 34
         ndkVersion = "26.1.10909125"
-        kotlinVersion = "1.9.25"
+        kkotlinVersion = "2.0.21"
     }
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://storage.zego.im/maven' }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle")
+        classpath("com.android.tools.build:gradle:8.4.0")
         classpath("com.facebook.react:react-native-gradle-plugin")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
+        classpath("com.google.gms:google-services:4.4.2")  // Add this for Firebase
     }
 }
-
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "$rootDir/../node_modules/react-native/android" }  // For React Native
+        maven { url 'https://storage.zego.im/maven' }
+        maven { url 'https://www.jitpack.io' }
+    }
+}
 apply plugin: "com.facebook.react.rootproject"

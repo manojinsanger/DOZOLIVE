@@ -1,4 +1,5 @@
-package com.dozolive
+package com.uecoentertainment.dozoLive
+
 
 import android.app.Application
 import com.facebook.react.PackageList

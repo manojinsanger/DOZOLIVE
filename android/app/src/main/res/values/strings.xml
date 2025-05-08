@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">DozoLive</string>
+    <string name="facebook_app_id">9015255065269257</string>
+    <string name="facebook_client_token">b8e6c5b2b2e2fdc529a27965955674a8</string>
+    <string name="fb_login_protocol_scheme">fb9015255065269257</string>
 </resources>

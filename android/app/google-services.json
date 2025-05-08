@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "210237367752",
+    "project_id": "dozo-live",
+    "storage_bucket": "dozo-live.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:210237367752:android:62506ffbbcdfc104ff4cfd",
+        "android_client_info": {
+          "package_name": "com.uecoentertainment.dozoLive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "210237367752-n7a0kvpt0js41mclhnadko45it7q3vlg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uecoentertainment.dozoLive",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "210237367752-kd6a2ke3kmka06ueitfnhi8uehq3s2et.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8ec-J08UaR_CoBQVk_qwTCfcVEtEHDG8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "210237367752-kd6a2ke3kmka06ueitfnhi8uehq3s2et.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "210237367752-svodrq9kdo0jiarugf621skvrpf72agj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.rahulksoftdev.myapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
