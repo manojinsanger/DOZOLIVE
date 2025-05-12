@@ -103,6 +103,7 @@ import UserJoinLiveScreen from '@/screens/otherScreens/LiveScreens/JoinRoom';
 import CreatePostScreen from '@/components/posts_related/CreatePostScreen';
 import PostDetailScreen from '@/components/posts_related/PostDetailScreen';
 import UpdatePostScreen from '@/components/posts_related/UpdatePostScreen';
+import AudienceAudioRoom from '@/screens/otherScreens/LiveScreens/AudienceAudioRoom';
 
 export type MainStackParamList = {
     Tabs: undefined;
@@ -297,10 +298,15 @@ export default function MainStackNavigator() {
                 <Stack.Screen name="audioscreen" component={AudioRoom} />
                 <Stack.Screen name="roomentryscreen" component={RoomEntryScreen} />
                 <Stack.Screen name="publicprofilepage" component={PublicProfilePage} />
-            
+
                 <Stack.Screen name="PostDetail" component={PostDetailScreen} />
-<Stack.Screen name="CreatePost" component={CreatePostScreen} />
-<Stack.Screen name="UpdatePost" component={UpdatePostScreen} />
+                <Stack.Screen name="CreatePost" component={CreatePostScreen} />
+                <Stack.Screen name="UpdatePost" component={UpdatePostScreen} />
+
+
+
+
+            <Stack.Screen name="audienceaudioroom" component={AudienceAudioRoom} />
             </Stack.Navigator>
         </UserProvider>
     );

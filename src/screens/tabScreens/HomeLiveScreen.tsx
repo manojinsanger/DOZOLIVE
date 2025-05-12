@@ -83,6 +83,9 @@ const HomeScreen: React.FC = () => {
           <TouchableOpacity onPress={() => redirect('joinStream')}>
             <Text>Join Live</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => redirect('audienceaudioroom')}>
+            <Text>audienceaudioroom  Live</Text>
+          </TouchableOpacity>
           {/* <TouchableOpacity onPress={() => redirect('audioscreen')}>
           <Text>Audio Live screen</Text>
         </TouchableOpacity>

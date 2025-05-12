@@ -26,6 +26,7 @@ const GET_LICENSE_CGI =
  * @param {string} assetsRelativePath Relative path from the assets directory
  * @param {string} destinationPath Target path
  */
+
 async function copyAssetsRecursively(
   assetsRelativePath: string,
   destinationPath: string
@@ -97,10 +98,10 @@ export default class EffectsHelper {
   // }
 
   static async initEffects() {
-    if (Platform.OS == "android") {
-      // Copy resources to SD card
-      this.copyResources();
-    }
+    // if (Platform.OS == "android") {
+    //   // Copy resources to SD card
+    //   this.copyResources();
+    // }
 
     // const license = await this.getLicense();
     // if (!license) {
@@ -119,30 +120,37 @@ export default class EffectsHelper {
     await this.effects.enableImageProcessing(true);
 
     this.effects.enableWhiten(true);
-    this.effects.setWhitenParam({ intensity: 50});
+    this.effects.setWhitenParam({ intensity: 50 });
 
     this.effects.enableSmooth(true);
-    this.effects.setSmoothParam({ intensity: 50});
+    this.effects.setSmoothParam({ intensity: 50 });
 
     this.effects.enableSharpen(true);
-    this.effects.setSharpenParam({ intensity:50 });
+    this.effects.setSharpenParam({ intensity: 50 });
 
     this.effects.enableRosy(true);
     this.effects.setRosyParam({ intensity: 50 });
 
     this.effects.enableWrinklesRemoving(true);
-    this.effects.setWrinklesRemovingParam({ intensity: 50});
+    this.effects.setWrinklesRemovingParam({ intensity: 50 });
 
     this.effects.enableDarkCirclesRemoving(true);
-    this.effects.setDarkCirclesRemovingParam({ intensity:50 });
+    this.effects.setDarkCirclesRemovingParam({ intensity: 50 });
 
     this.effects.enableAcneRemoving(true);
-    this.effects.setAcneRemovingParam({ intensity:50});
+    this.effects.setAcneRemovingParam({ intensity: 50 });
+
   }
 
   static async destroyEffects() {
     if (this.effects) {
       await this.effects.destroy();
+      if (this.effects) {
+        console.log(this.effects)
+      }
+      this.effects.stopPreview();
+this.effects.uninit();
+      this.effects = null;
     }
   }
 
@@ -153,11 +161,11 @@ export default class EffectsHelper {
   ) {
     console.info(
       "updateEffects: groupItem=" +
-        groupItem.type +
-        ", beautyItem=" +
-        JSON.stringify(beautyItem) +
-        " currentIntensity: " +
-        currentIntensity
+      groupItem.type +
+      ", beautyItem=" +
+      JSON.stringify(beautyItem) +
+      " currentIntensity: " +
+      currentIntensity
     );
 
     // Call corresponding effects APIs based on BeautyItem type
@@ -361,6 +369,7 @@ export default class EffectsHelper {
             this.effects?.enableChromaKey(true);
           }
           break;
+
         case BeautyType.Background_Blur:
           if (currentIntensity == 0) {
             this.effects?.enablePortraitSegmentationBackgroundBlur(false);
@@ -376,6 +385,7 @@ export default class EffectsHelper {
             });
           }
           break;
+
         case BeautyType.Background_Mosaic:
           if (currentIntensity == 0) {
             this.effects?.enablePortraitSegmentationBackgroundMosaic(false);
@@ -385,6 +395,7 @@ export default class EffectsHelper {
             this.effects?.enableChromaKeyBackgroundMosaic(true);
           }
           break;
+
         case BeautyType.Background:
           if (currentIntensity == 0) {
             this.effects?.enablePortraitSegmentationBackground(false);
@@ -395,7 +406,9 @@ export default class EffectsHelper {
           }
           break;
       }
-    } else if (groupItem.type == BeautyType.Colorful_Style) {
+
+    }
+    else if (groupItem.type == BeautyType.Colorful_Style) {
       if (currentIntensity == 0) {
         this.effects?.enableFilter(false);
       } else {
@@ -405,6 +418,7 @@ export default class EffectsHelper {
           type: beautyItem.params as ZegoEffectsFilterType,
         });
       }
+
     } else if (groupItem.type == BeautyType.Background_Mosaic) {
       // Mosaic
       this.effects?.setPortraitSegmentationBackgroundMosaicParam({

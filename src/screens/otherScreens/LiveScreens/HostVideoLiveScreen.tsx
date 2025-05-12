@@ -35,12 +35,13 @@ import TermsAndConditions from '@/components/live/TermsAndConditions';
 import MainContainer3 from '@/components/common/mainContainers/MainContainer3';
 import LiveOverlayOfLive from '@/components/live/LiveOverlayOfLive';
 import { useAuth } from '@/context/AuthProvider';
-import ZegoEffects from '@zegocloud/zego-effects-reactnative';
+// import ZegoEffects from '@zegocloud/zego-effects-reactnative';
 import KeepAwake from 'react-native-keep-awake';
-import { useZegoEffects } from '@/context/ZegoEffectsProvider';
+// import { useZegoEffects } from '@/context/ZegoEffectsProvider';
 import MainContainer from '@/components/common/mainContainers/MainContainer';
 import EffectsHelper from '@/zegodata/EffectsHelper';
 import KeyCenter from '@/zegodata/KeyCenter';
+// import { initializeZegoEffects } from '@/config/zegoEffects';
 // import { useZegoEffects } from '@/context/ZegoEffectsProvider';
 // import { initializeZegoEffects } from '@/config/zegoEffects';
 
@@ -116,7 +117,6 @@ const HostVideoLiveScreen = () => {
     const [users, setUsers] = useState<ZegoUser[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [intensity, setIntensity] = useState(50);
-    const effectsRef = useRef<ZegoEffects | null>(null);
     const [allMessages, setAllMessages] = useState<AllMessage[]>([
         {
             id: 'system-0',
@@ -126,7 +126,7 @@ const HostVideoLiveScreen = () => {
         },
     ]);
     const [roomMessages, setRoomMessages] = useState<RoomMessage[]>([]);
-    const { initializeEffects } = useZegoEffects();
+    // const { initializeEffects } = useZegoEffects();
     const previewRef = useRef<any>(null);
     const { user } = useAuth();
 
@@ -142,170 +142,171 @@ const HostVideoLiveScreen = () => {
 
     useEffect(() => {
         const initZego = async () => {
-          try {
-            await ZegoExpressEngine.createEngineWithProfile({
-              appID: zegoConfig.appID,
-              appSign: zegoConfig.appSign,
-              scenario: zegoConfig.scenario,
-            });
-            const instance = ZegoExpressEngine.instance();
-
-            if (Platform.OS === 'android') await requestPermissions();
-
-            const authInfo = await ZegoEffects.getAuthInfo(zegoConfig.appSign);
-            console.log(authInfo, 'auth info of zego effects');
-
-            // Create Effects instance
-            const effects = new ZegoEffects(zegoConfig.licence);
-            effectsRef.current = effects;
-
-            effects.on('error', (errorCode, desc) => {
-              console.error(`Error code: ${errorCode}, Description: ${desc}`);
-            });
-
-            // Enable custom video processing
-            instance.enableCustomVideoProcessing(true, {}, ZegoPublishChannel.Main);
-
-            // Set video mirror mode
             try {
-              await instance.setVideoMirrorMode(ZegoVideoMirrorMode.BothMirror, ZegoPublishChannel.Main);
-            } catch (err) {
-              console.error('Failed to set video mirror mode:', err);
-              setErrorMessage('Failed to set video mirror mode');
-            }
+                await ZegoExpressEngine.createEngineWithProfile({
+                    appID: zegoConfig.appID,
+                    appSign: zegoConfig.appSign,
+                    scenario: zegoConfig.scenario,
+                });
+                const instance = ZegoExpressEngine.instance();
 
-            // Room user update listener
-            instance.on('roomUserUpdate', (roomID, updateType, userList) => {
-              console.log('User Update:', {
-                roomID,
-                updateType,
-                userList: userList.map((u) => ({ userID: u.userID, userName: u.userName })),
-              });
-              if (roomID === zegoConfig.roomID) {
-                if (updateType === ZegoUpdateType.Add) {
-                  setUsers((prevUsers) => [...prevUsers, ...userList]);
-                  setAllMessages((prev) => [
-                    ...prev,
-                    ...userList.map((u) => ({
-                      id: `join-${u.userID}-${Date.now()}`,
-                      type: 'join',
-                      userID: u.userID,
-                      userName: u.userName,
-                      timestamp: Date.now(),
-                    })),
-                  ]);
-                  setRoomMessages((prev) => [
-                    ...prev,
-                    ...userList.map((u) => ({
-                      id: `join-${u.userID}-${Date.now()}`,
-                      type: 'join',
-                      userID: u.userID,
-                      userName: u.userName,
-                      timestamp: Date.now(),
-                    })),
-                  ]);
-                } else if (updateType === ZegoUpdateType.Delete) {
-                  setUsers((prevUsers) =>
-                    prevUsers.filter((user) => !userList.some((u) => u.userID === user.userID)),
-                  );
-                  setAllMessages((prev) => [
-                    ...prev,
-                    ...userList.map((u) => ({
-                      id: `leave-${u.userID}-${Date.now()}`,
-                      type: 'leave',
-                      userID: u.userID,
-                      userName: u.userName,
-                      timestamp: Date.now(),
-                    })),
-                  ]);
-                  setRoomMessages((prev) => [
-                    ...prev,
-                    ...userList.map((u) => ({
-                      id: `leave-${u.userID}-${Date.now()}`,
-                      type: 'leave',
-                      userID: u.userID,
-                      userName: u.userName,
-                      timestamp: Date.now(),
-                    })),
-                  ]);
+                if (Platform.OS === 'android') await requestPermissions();
+
+                // const authInfo = await ZegoEffects.getAuthInfo(zegoConfig.appSign);
+                // console.log(authInfo, 'auth info of zego effects');
+
+                // Create Effects instance
+                // const effects = new ZegoEffects(zegoConfig.licence);
+                // effectsRef.current = effects;
+
+                // effects.on('error', (errorCode, desc) => {
+                //     console.error(`Error code: ${errorCode}, Description: ${desc}`);
+                // });
+
+                // Enable custom video processing
+                instance.enableCustomVideoProcessing(true, {}, ZegoPublishChannel.Main);
+
+                // Set video mirror mode
+                try {
+                    await instance.setVideoMirrorMode(ZegoVideoMirrorMode.BothMirror, ZegoPublishChannel.Main);
+                } catch (err) {
+                    console.error('Failed to set video mirror mode:', err);
+                    setErrorMessage('Failed to set video mirror mode');
                 }
-              }
-            });
 
-            // Broadcast message listener
-            instance.on('IMRecvBroadcastMessage', (roomID, messageList) => {
-              console.log('Broadcast Received:', {
-                roomID,
-                messageList: messageList.map((msg) => ({
-                  message: msg.message,
-                  userID: msg.fromUser.userID,
-                  userName: msg.fromUser.userName,
-                  timestamp: msg.sendTime,
-                })),
-              });
-              if (roomID === zegoConfig.roomID) {
-                const newMessages = messageList.map((msg) => ({
-                  id: `${msg.fromUser.userID}-${msg.sendTime}`,
-                  message: msg.message,
-                  userID: msg.fromUser.userID,
-                  userName: msg.fromUser.userName,
-                  timestamp: msg.sendTime,
-                }));
-                setMessages((prevMessages) => [...prevMessages, ...newMessages]);
-                setAllMessages((prev) => [
-                  ...prev,
-                  ...newMessages.map((msg) => ({
-                    id: msg.id,
-                    type: 'chat',
-                    message: msg.message,
-                    userID: msg.userID,
-                    userName: msg.userName,
-                    timestamp: msg.timestamp,
-                  })),
-                ]);
-              }
-            });
+                // Room user update listener
+                instance.on('roomUserUpdate', (roomID, updateType, userList) => {
+                    console.log('User Update:', {
+                        roomID,
+                        updateType,
+                        userList: userList.map((u) => ({ userID: u.userID, userName: u.userName })),
+                    });
+                    if (roomID === zegoConfig.roomID) {
+                        if (updateType === ZegoUpdateType.Add) {
+                            setUsers((prevUsers) => [...prevUsers, ...userList]);
+                            setAllMessages((prev) => [
+                                ...prev,
+                                ...userList.map((u) => ({
+                                    id: `join-${u.userID}-${Date.now()}`,
+                                    type: 'join',
+                                    userID: u.userID,
+                                    userName: u.userName,
+                                    timestamp: Date.now(),
+                                })),
+                            ]);
+                            setRoomMessages((prev) => [
+                                ...prev,
+                                ...userList.map((u) => ({
+                                    id: `join-${u.userID}-${Date.now()}`,
+                                    type: 'join',
+                                    userID: u.userID,
+                                    userName: u.userName,
+                                    timestamp: Date.now(),
+                                })),
+                            ]);
+                        } else if (updateType === ZegoUpdateType.Delete) {
+                            setUsers((prevUsers) =>
+                                prevUsers.filter((user) => !userList.some((u) => u.userID === user.userID)),
+                            );
+                            setAllMessages((prev) => [
+                                ...prev,
+                                ...userList.map((u) => ({
+                                    id: `leave-${u.userID}-${Date.now()}`,
+                                    type: 'leave',
+                                    userID: u.userID,
+                                    userName: u.userName,
+                                    timestamp: Date.now(),
+                                })),
+                            ]);
+                            setRoomMessages((prev) => [
+                                ...prev,
+                                ...userList.map((u) => ({
+                                    id: `leave-${u.userID}-${Date.now()}`,
+                                    type: 'leave',
+                                    userID: u.userID,
+                                    userName: u.userName,
+                                    timestamp: Date.now(),
+                                })),
+                            ]);
+                        }
+                    }
+                });
 
-            // Room state update listener
-            instance.on('roomStateUpdate', (roomID, state, errorCode) => {
-              console.log('Room State Update:', { roomID, state, errorCode });
-            });
+                // Broadcast message listener
+                instance.on('IMRecvBroadcastMessage', (roomID, messageList) => {
+                    console.log('Broadcast Received:', {
+                        roomID,
+                        messageList: messageList.map((msg) => ({
+                            message: msg.message,
+                            userID: msg.fromUser.userID,
+                            userName: msg.fromUser.userName,
+                            timestamp: msg.sendTime,
+                        })),
+                    });
+                    if (roomID === zegoConfig.roomID) {
+                        const newMessages = messageList.map((msg) => ({
+                            id: `${msg.fromUser.userID}-${msg.sendTime}`,
+                            message: msg.message,
+                            userID: msg.fromUser.userID,
+                            userName: msg.fromUser.userName,
+                            timestamp: msg.sendTime,
+                        }));
+                        setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+                        setAllMessages((prev) => [
+                            ...prev,
+                            ...newMessages.map((msg) => ({
+                                id: msg.id,
+                                type: 'chat',
+                                message: msg.message,
+                                userID: msg.userID,
+                                userName: msg.userName,
+                                timestamp: msg.timestamp,
+                            })),
+                        ]);
+                    }
+                });
 
-            // Initialize effects
-            await EffectsHelper.initEffects();
-            // await initializeEffects(zegoConfig.licence)
+                // Room state update listener
+                instance.on('roomStateUpdate', (roomID, state, errorCode) => {
+                    console.log('Room State Update:', { roomID, state, errorCode });
+                });
 
-    // 
-            // Log SDK versions
-            // const expressVersion = await instance.getVers();
-            const effectsVersion = await ZegoEffects.getVersion();
-            // console.log('Express SDK Version:', expressVersion);
-            console.log('Effects SDK Version:', effectsVersion);
+                // Initialize effects
+                await EffectsHelper.initEffects();
+                // await initializeEffects(zegoConfig.licence)
 
-            startPreviewWithDelay();
-          } catch (err:any) {
-            console.error('Zego init error:', err);
-            setErrorMessage(err.message);
-          }
+                // 
+                // Log SDK versions
+                // const expressVersion = await instance.getVers();
+                // const effectsVersion = await ZegoEffects.getVersion();
+                // console.log('Express SDK Version:', expressVersion);
+                // console.log('Effects SDK Version:', effectsVersion);
+
+                startPreviewWithDelay();
+            } catch (err: any) {
+                console.error('Zego init error:', err);
+                setErrorMessage(err.message);
+            }
         };
 
         initZego();
 
         // Handle hardware back button press
         const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-          setIsModalVisible(true);
-          return true;
+            setIsModalVisible(true);
+            return true;
         });
 
         return () => {
-          backHandler.remove();
-          const instance = ZegoExpressEngine.instance();
-          instance.off('roomUserUpdate');
-          instance.off('IMRecvBroadcastMessage');
-          instance.off('roomStateUpdate');
-          ZegoExpressEngine.destroyEngine();
+            backHandler.remove();
+            const instance = ZegoExpressEngine.instance();
+            instance.off('roomUserUpdate');
+            instance.off('IMRecvBroadcastMessage');
+            instance.off('roomStateUpdate');
+            ZegoExpressEngine.destroyEngine()
+            previewRef.current = null;
         };
-      }, []);
+    }, []);
 
     const requestPermissions = async () => {
         const permissions = [PermissionsAndroid.PERMISSIONS.CAMERA, PermissionsAndroid.PERMISSIONS.RECORD_AUDIO];
