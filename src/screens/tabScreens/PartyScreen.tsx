@@ -7,8 +7,8 @@ import PartyCard from '@/components/party/PartyCard';
 import { scaleHeight } from '@/constants/scaling';
 import { BannerProps, PartyCardProps } from '@/types/types';
 import { redirect } from '@/utils/navigationService';
-import React from 'react';
-import { ScrollView, StatusBar, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StatusBar, StyleSheet, View,RefreshControl, Image,Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const demoParties = [
@@ -381,14 +381,81 @@ const combinedData: CombinedDataItem[] = [
 
 
 const PartyScreen: React.FC = () => {
+
+    const [allAudioRooms, setAllAudioRooms] = React.useState<any[]>([]);
+    const [refreshing, setRefreshing] = useState(false);
+
+   const fetchData = async () => {
+        try {
+            setRefreshing(true);
+            const response = await fetch('http://10.0.2.2:3010/api/live/getallaudiorooms', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            setAllAudioRooms(data.rooms);
+            console.log('Fetched Data:', data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setRefreshing(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+    console.log('Fetched Data:', allAudioRooms);
+
+
+
     return (
         <MainContainer>
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={styles.container}>
                     <PartyHeader />
-                    <ScrollView contentContainerStyle={styles.scrollContent}>
+                    <ScrollView contentContainerStyle={styles.scrollContent} refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={fetchData}
+                                colors={['#9Bd7D5']} // Optional: Customize the refresh indicator color
+                            />
+                        }>
                         <Banner banners={BannerData} />
-                        {demoParties.slice(0, 4).map((item, index) => (
+                        <View>
+                        {
+                           allAudioRooms &&  allAudioRooms.map((item, index) => (
+                            <>
+                            <TouchableOpacity onPress={()=>redirect("audienceaudioroom",{roomDetails:item})} >
+                                <Image source={{ uri: item.image }} style={{width:50,height:50}} />
+                                <Text style={{fontSize:20}}>
+                                    {
+                                        item?.roomId
+                                    }
+                                </Text>
+                                <Text>
+                                    {
+                                        item?.title
+                                    }
+                                </Text>
+                                <Text>
+                                    {
+                                        item?.hostId
+                                    }
+                                </Text>
+                                <Text>
+                                    {
+                                        item?.specialId
+                                    }
+                                </Text>
+                            </TouchableOpacity>
+                            </>
+                              ))
+                        }
+                        </View>
+                        {/* {demoParties.slice(0, 4).map((item, index) => (
                             <PartyCard
                                 key={index}
                                 title={item.title}
@@ -399,7 +466,7 @@ const PartyScreen: React.FC = () => {
                                 hosts={item.hosts}
                                 onPress={() => redirect("audioscreen")}
                             />
-                        ))}
+                        ))} */}
                         <Banner banners={BannerData} />
                         {demoParties.slice(4).map((item, index) => (
                             <PartyCard

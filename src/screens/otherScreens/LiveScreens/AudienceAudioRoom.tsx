@@ -14,12 +14,39 @@ import ZegoExpressEngine, {
 import KeyCenter from '@/zegodata/KeyCenter';
 import { useUser } from '@/context/UserProvider';
 import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useAudioRoom } from '@/context/AudioRoomSocketProvider';
+import UserDetails from '@/components/profile/UserDetail';
+import { leaveChatRoom } from '@/controllers/agoraChatService';
 
 const AudienceAudioRoom = () => {
-    const roomID = 'room_1234';
+    const navigation = useNavigation();
+    const { params } = useRoute();
+    console.log('AudioRoom params:', params.roomDetails,);
+    const roomID = params.roomDetails.roomId;
     const hostID = '49296184'; // Replace with real host ID
     const streamIDFromHost = `stream_${hostID}`;
     const engineRef = useRef<ZegoExpressEngine | null>(null);
+
+    const { room, joinRoom ,leaveRoom,requestCohost} = useAudioRoom()
+
+    useEffect(() => {
+        console.log(room, 'room from context');
+    }, [room])
+    useEffect(() => {
+        joinRoom({
+            roomId: roomID,
+            id: userAllDetails.liveId,
+            userName: UserDetails.name || 'dozolive',
+            userProfile: userAllDetails.profile,
+            level: 1,
+            specialId: userAllDetails?.specialId,
+        });
+        console.log('Joining room with ID:', roomID);
+        return()=>{
+            leaveRoom(roomID, userAllDetails.liveId)
+        }
+    },[])
 
     const [roomState, setRoomState] = useState<ZegoRoomState>('DISCONNECTED');
     const [streamList, setStreamList] = useState<any[]>([]);
@@ -79,6 +106,12 @@ const AudienceAudioRoom = () => {
         }
     };
 
+
+    const RequestCohost=async()=>{
+       await requestCohost(roomID, userAllDetails.liveId)
+        console .log('Requesting co-host');
+    }
+
     // --- Setup Event Handlers ---
     const setupEventHandlers = (engine: ZegoExpressEngine) => {
         engine.on('roomStateUpdate', (roomID, state) => {
@@ -111,7 +144,7 @@ const AudienceAudioRoom = () => {
     };
 
     // --- Join Room ---
-    const joinRoom = async () => {
+    const joinZegoRoom = async () => {
         try {
             const engine = await initEngine();
             if (!engine) return;
@@ -172,7 +205,7 @@ const AudienceAudioRoom = () => {
     };
 
     useEffect(() => {
-        requestPermissions().then(joinRoom);
+        requestPermissions().then(joinZegoRoom);
         return () => {
             cleanup();
         };
@@ -193,8 +226,22 @@ const AudienceAudioRoom = () => {
                     : '⏳ Waiting for host to start broadcasting...'}
             </Text>
 
-            <TouchableOpacity onPress={startBroadcasting}>
-                <Text style={styles.broadcastBtn}>Start Broadcasting (Test)</Text>
+<View>
+    {
+        room?.users.map((user, index) => (
+            <View>
+                <Text style={{ color: 'black',fontSize:20 }} key={index}>
+                    {user.id} - {user.userName}
+                </Text>
+            </View>
+        ))
+    }
+</View>
+
+
+
+            <TouchableOpacity onPress={RequestCohost}>
+                <Text style={styles.broadcastBtn}>request to become cohost </Text>
             </TouchableOpacity>
         </View>
     );

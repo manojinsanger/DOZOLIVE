@@ -27,7 +27,7 @@ const Preview: React.FC = () => {
   const navigation = useNavigation();
 
   const { params } = useRoute();
-const userID="364823648";
+  const userID = "364823648";
   const previewRef = useRef();
 
   const roomID = "9999";
@@ -63,7 +63,7 @@ const userID="364823648";
       undefined
     );
 
-    return () => {};
+    return () => { };
   }, []);
   let isCooldown = false;
   const onClickBack = () => {

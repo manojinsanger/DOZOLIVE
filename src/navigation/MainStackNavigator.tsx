@@ -104,6 +104,8 @@ import CreatePostScreen from '@/components/posts_related/CreatePostScreen';
 import PostDetailScreen from '@/components/posts_related/PostDetailScreen';
 import UpdatePostScreen from '@/components/posts_related/UpdatePostScreen';
 import AudienceAudioRoom from '@/screens/otherScreens/LiveScreens/AudienceAudioRoom';
+import CreateAudioRoomScreen from '@/screens/otherScreens/LiveScreens/CreateLiveAudioRoom';
+import { AudioRoomProvider } from '@/context/AudioRoomSocketProvider'; // Adjust the import path
 
 export type MainStackParamList = {
     Tabs: undefined;
@@ -198,116 +200,119 @@ const Stack = createNativeStackNavigator<MainStackParamList>();
 export default function MainStackNavigator() {
     return (
         <UserProvider>
-            <Stack.Navigator
-                // screenOptions={{
-                //     headerShown: false,
-                //     animation: 'slide_from_right', 
-                // }}
-                screenOptions={{
-                    headerShown: false,
-                    animation: 'slide_from_right', // Options: 'default', 'fade', 'slide_from_right', 'slide_from_left', 'slide_from_bottom', 'none'
-                    animationDuration: 100, // 💡 speeds up the transition (default is ~300)
-                }}
-            >
-                <Stack.Screen name="Tabs" component={MainTabNavigator} options={{ headerShown: false }} />
-                <Stack.Screen name="store" component={StorePage} />
-                <Stack.Screen name="myagency" component={AgencyJoinScreen} />
-                <Stack.Screen name="agencycongratulations" component={AgencyCongratulationsScreen} />
-                <Stack.Screen name="livedata" component={LiveData} />
-                <Stack.Screen name="rewards" component={RewardScreen} />
-                <Stack.Screen name="ranking" component={Ranking} />
-                <Stack.Screen name="invite" component={InviteScreen} />
-                <Stack.Screen name="agent" component={Agent} />
-                <Stack.Screen name="agentinvite" component={AgentInvite} />
-                <Stack.Screen name="agentinvitebutton" component={AgentInviteButton} />
-                <Stack.Screen name="addhost" component={AddHost} />
-                <Stack.Screen name="addhostbutton" component={AddHostButton} />
-                <Stack.Screen name="agentranking" component={AgentRanking} />
-                <Stack.Screen name="hostapplication" component={HostApplication} />
-                <Stack.Screen name="activitycenter" component={ActivityCenter} />
-                <Stack.Screen name="rulespage" component={RulesPage} />
-                <Stack.Screen name="trading" component={Trading} />
-                <Stack.Screen name="morepricedetails" component={MorePriceDetails} />
-                <Stack.Screen name="exchangecoins" component={ExchangeCoinsScreen} />
-                <Stack.Screen name="topupcoin" component={TopUpCoin} />
-                <Stack.Screen name="tradingdetails" component={TradingDetails} />
-                <Stack.Screen name="bdcenter" component={BDCenterScreen} />
-                <Stack.Screen name="agencydata" component={AgencyData} />
-                <Stack.Screen name="allagency" component={AllAgency} />
-                <Stack.Screen name="inviteagency" component={InviteAgency} />
-                <Stack.Screen name="payroll" component={PayrollScreen} />
-                <Stack.Screen name="abandonmentOfordersscreen" component={AbandonmentOfOrdersScreen} />
-                <Stack.Screen name="coins" component={Coins} />
-                <Stack.Screen name="agents" component={Agents} />
-                <Stack.Screen name="record" component={RecordPage} />
-                <Stack.Screen name="points" component={PointsScreen} />
-                <Stack.Screen name="withdrawnow" component={WithdrawNow} />
-                <Stack.Screen name="transfer" component={TransferScreen} />
-                <Stack.Screen name="transactiondetails" component={TransactionDetailsScreen} />
-                {/* ----profile --  */}
-                <Stack.Screen name="profilebyid" component={ProfileById} />
+            <AudioRoomProvider>
+                <Stack.Navigator
+                    // screenOptions={{
+                    //     headerShown: false,
+                    //     animation: 'slide_from_right', 
+                    // }}
+                    screenOptions={{
+                        headerShown: false,
+                        animation: 'slide_from_right', // Options: 'default', 'fade', 'slide_from_right', 'slide_from_left', 'slide_from_bottom', 'none'
+                        animationDuration: 100, // 💡 speeds up the transition (default is ~300)
+                    }}
+                >
+                    <Stack.Screen name="Tabs" component={MainTabNavigator} options={{ headerShown: false }} />
+                    <Stack.Screen name="store" component={StorePage} />
+                    <Stack.Screen name="myagency" component={AgencyJoinScreen} />
+                    <Stack.Screen name="agencycongratulations" component={AgencyCongratulationsScreen} />
+                    <Stack.Screen name="livedata" component={LiveData} />
+                    <Stack.Screen name="rewards" component={RewardScreen} />
+                    <Stack.Screen name="ranking" component={Ranking} />
+                    <Stack.Screen name="invite" component={InviteScreen} />
+                    <Stack.Screen name="agent" component={Agent} />
+                    <Stack.Screen name="agentinvite" component={AgentInvite} />
+                    <Stack.Screen name="agentinvitebutton" component={AgentInviteButton} />
+                    <Stack.Screen name="addhost" component={AddHost} />
+                    <Stack.Screen name="addhostbutton" component={AddHostButton} />
+                    <Stack.Screen name="agentranking" component={AgentRanking} />
+                    <Stack.Screen name="hostapplication" component={HostApplication} />
+                    <Stack.Screen name="activitycenter" component={ActivityCenter} />
+                    <Stack.Screen name="rulespage" component={RulesPage} />
+                    <Stack.Screen name="trading" component={Trading} />
+                    <Stack.Screen name="morepricedetails" component={MorePriceDetails} />
+                    <Stack.Screen name="exchangecoins" component={ExchangeCoinsScreen} />
+                    <Stack.Screen name="topupcoin" component={TopUpCoin} />
+                    <Stack.Screen name="tradingdetails" component={TradingDetails} />
+                    <Stack.Screen name="bdcenter" component={BDCenterScreen} />
+                    <Stack.Screen name="agencydata" component={AgencyData} />
+                    <Stack.Screen name="allagency" component={AllAgency} />
+                    <Stack.Screen name="inviteagency" component={InviteAgency} />
+                    <Stack.Screen name="payroll" component={PayrollScreen} />
+                    <Stack.Screen name="abandonmentOfordersscreen" component={AbandonmentOfOrdersScreen} />
+                    <Stack.Screen name="coins" component={Coins} />
+                    <Stack.Screen name="agents" component={Agents} />
+                    <Stack.Screen name="record" component={RecordPage} />
+                    <Stack.Screen name="points" component={PointsScreen} />
+                    <Stack.Screen name="withdrawnow" component={WithdrawNow} />
+                    <Stack.Screen name="transfer" component={TransferScreen} />
+                    <Stack.Screen name="transactiondetails" component={TransactionDetailsScreen} />
+                    {/* ----profile --  */}
+                    <Stack.Screen name="profilebyid" component={ProfileById} />
 
-                <Stack.Screen name="settingscreen" component={SettingsScreen} />
-                <Stack.Screen name="notification" component={NotificationsScreen} />
-                <Stack.Screen name="privacy" component={Privacy} />
-                <Stack.Screen name="blockedlist" component={BlockedListScreen} />
-                <Stack.Screen name="connectedaccount" component={ConnectedAccountScreen} />
-                <Stack.Screen name="aboutus" component={AboutUsScreen} />
-                <Stack.Screen name="helpus" component={HelpUs} />
-                <Stack.Screen name="privacypolicy" component={PrivacyPolicy} />
-                <Stack.Screen name="useragreement" component={UserAgreementScreen} />
-                <Stack.Screen name="broadcasteragreement" component={BroadcasterAgreement} />
-                <Stack.Screen name="userrechargeagreement" component={UserRechargeAgreement} />
-                <Stack.Screen name="nochildagreement" component={NoChildAgreement} />
-                <Stack.Screen name="facebookaccount" component={FacebookAccountScreen} />
-                <Stack.Screen name="twitteraccount" component={TwitterAccountScreen} />
-                <Stack.Screen name="instagramaccount" component={InstagramAccountScreen} />
-                <Stack.Screen name="googleaccount" component={GoogleAccountScreen} />
-                <Stack.Screen name="phoneaccount" component={PhoneAccount} />
-                <Stack.Screen name="livetestscreen" component={LiveTextScreen} />
-                <Stack.Screen name="myagencywrapper" component={MyAgencyWrapper} />
-                <Stack.Screen name="livetestscreen2" component={HostVideoLiveScreenWrapper} />
-                <Stack.Screen name="preview" component={Preview} />
-                <Stack.Screen name="joinStream" component={UserJoinLiveScreen} />
-
-
-                <Stack.Screen name="newtaskscreen" component={NewTaskSystem} />
-                <Stack.Screen name="agentRecruiting" component={AgentRecruiting} />
-                <Stack.Screen name="withdrawalRecord" component={WithdrawalRecord} />
-                <Stack.Screen name="withdrawalDetails" component={WithdrawalDetails} />
-                <Stack.Screen name="scamAlert" component={ScamAlert} />
-                <Stack.Screen name="pointsToBeConfirmed" component={PointsConfirmationScreen} />
-                <Stack.Screen name="paymentMethods" component={PaymentMethodScreen} />
-                <Stack.Screen name="viewpaymentdetails" component={ViewPaymentDetails} />
+                    <Stack.Screen name="settingscreen" component={SettingsScreen} />
+                    <Stack.Screen name="notification" component={NotificationsScreen} />
+                    <Stack.Screen name="privacy" component={Privacy} />
+                    <Stack.Screen name="blockedlist" component={BlockedListScreen} />
+                    <Stack.Screen name="connectedaccount" component={ConnectedAccountScreen} />
+                    <Stack.Screen name="aboutus" component={AboutUsScreen} />
+                    <Stack.Screen name="helpus" component={HelpUs} />
+                    <Stack.Screen name="privacypolicy" component={PrivacyPolicy} />
+                    <Stack.Screen name="useragreement" component={UserAgreementScreen} />
+                    <Stack.Screen name="broadcasteragreement" component={BroadcasterAgreement} />
+                    <Stack.Screen name="userrechargeagreement" component={UserRechargeAgreement} />
+                    <Stack.Screen name="nochildagreement" component={NoChildAgreement} />
+                    <Stack.Screen name="facebookaccount" component={FacebookAccountScreen} />
+                    <Stack.Screen name="twitteraccount" component={TwitterAccountScreen} />
+                    <Stack.Screen name="instagramaccount" component={InstagramAccountScreen} />
+                    <Stack.Screen name="googleaccount" component={GoogleAccountScreen} />
+                    <Stack.Screen name="phoneaccount" component={PhoneAccount} />
+                    <Stack.Screen name="livetestscreen" component={LiveTextScreen} />
+                    <Stack.Screen name="myagencywrapper" component={MyAgencyWrapper} />
+                    <Stack.Screen name="livetestscreen2" component={HostVideoLiveScreenWrapper} />
+                    <Stack.Screen name="preview" component={Preview} />
+                    <Stack.Screen name="joinStream" component={UserJoinLiveScreen} />
 
 
-                <Stack.Screen name="followingpage" component={FollowPage} />
-                <Stack.Screen name="followerspage" component={FollowersPage} />
-                <Stack.Screen name="friendspage" component={FriendsPage} />
-                <Stack.Screen name="visitorspage" component={VisitorsPage} />
-                <Stack.Screen name="topupdetails" component={TopupDetails} />
-                <Stack.Screen name="helpscreen" component={HelpScreen} />
-                <Stack.Screen name="myfeedback" component={MyFeedback} />
-                <Stack.Screen name="messagefeedback" component={MessageFeedback} />
-
-                <Stack.Screen name="hostdetails" component={HostDetails} />
-                <Stack.Screen name="profileedit" component={ProfileEdit} />
-                <Stack.Screen name="askHelpPage" component={AskHelpPage} />
-                <Stack.Screen name="level" component={Level} />
-                <Stack.Screen name="liveenedscreen" component={LiveEndedScreen} />
-                <Stack.Screen name="audioscreen" component={AudioRoom} />
-                <Stack.Screen name="roomentryscreen" component={RoomEntryScreen} />
-                <Stack.Screen name="publicprofilepage" component={PublicProfilePage} />
-
-                <Stack.Screen name="PostDetail" component={PostDetailScreen} />
-                <Stack.Screen name="CreatePost" component={CreatePostScreen} />
-                <Stack.Screen name="UpdatePost" component={UpdatePostScreen} />
+                    <Stack.Screen name="newtaskscreen" component={NewTaskSystem} />
+                    <Stack.Screen name="agentRecruiting" component={AgentRecruiting} />
+                    <Stack.Screen name="withdrawalRecord" component={WithdrawalRecord} />
+                    <Stack.Screen name="withdrawalDetails" component={WithdrawalDetails} />
+                    <Stack.Screen name="scamAlert" component={ScamAlert} />
+                    <Stack.Screen name="pointsToBeConfirmed" component={PointsConfirmationScreen} />
+                    <Stack.Screen name="paymentMethods" component={PaymentMethodScreen} />
+                    <Stack.Screen name="viewpaymentdetails" component={ViewPaymentDetails} />
 
 
+                    <Stack.Screen name="followingpage" component={FollowPage} />
+                    <Stack.Screen name="followerspage" component={FollowersPage} />
+                    <Stack.Screen name="friendspage" component={FriendsPage} />
+                    <Stack.Screen name="visitorspage" component={VisitorsPage} />
+                    <Stack.Screen name="topupdetails" component={TopupDetails} />
+                    <Stack.Screen name="helpscreen" component={HelpScreen} />
+                    <Stack.Screen name="myfeedback" component={MyFeedback} />
+                    <Stack.Screen name="messagefeedback" component={MessageFeedback} />
+
+                    <Stack.Screen name="hostdetails" component={HostDetails} />
+                    <Stack.Screen name="profileedit" component={ProfileEdit} />
+                    <Stack.Screen name="askHelpPage" component={AskHelpPage} />
+                    <Stack.Screen name="level" component={Level} />
+                    <Stack.Screen name="liveenedscreen" component={LiveEndedScreen} />
+                    <Stack.Screen name="roomentryscreen" component={RoomEntryScreen} />
+                    <Stack.Screen name="publicprofilepage" component={PublicProfilePage} />
+
+                    <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+                    <Stack.Screen name="CreatePost" component={CreatePostScreen} />
+                    <Stack.Screen name="UpdatePost" component={UpdatePostScreen} />
 
 
-            <Stack.Screen name="audienceaudioroom" component={AudienceAudioRoom} />
-            </Stack.Navigator>
+
+
+                    <Stack.Screen name="audioscreen" component={AudioRoom} />
+                    <Stack.Screen name="audienceaudioroom" component={AudienceAudioRoom} />
+                    <Stack.Screen name="createaudioroom" component={CreateAudioRoomScreen} />
+                </Stack.Navigator>
+            </AudioRoomProvider>
         </UserProvider>
     );
 }

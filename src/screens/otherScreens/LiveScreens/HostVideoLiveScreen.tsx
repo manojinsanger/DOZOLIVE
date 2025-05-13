@@ -27,7 +27,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import LinnerGradientCard2 from '@/components/common/gradientCards/LinnearGradientCard2';
 import { scaleFont, scaleHeight, scaleWidth } from '@/constants/scaling';
 import customColors from '@/constants/styles';
-import { goBack } from '@/utils/navigationService';
+import { goBack, redirect } from '@/utils/navigationService';
 import LiveSetupExitModal from '@/components/live/LiveSetupExitModal';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FilterButton from '@/components/live/FilterButton';
@@ -272,7 +272,7 @@ const HostVideoLiveScreen = () => {
                 });
 
                 // Initialize effects
-                await EffectsHelper.initEffects();
+                // await EffectsHelper.initEffects();
                 // await initializeEffects(zegoConfig.licence)
 
                 // 
@@ -554,14 +554,29 @@ const HostVideoLiveScreen = () => {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.streamTypeContainer}>
-                        {['Live', 'Audio'].map((type) => (
-                            <TouchableOpacity key={type} onPress={() => setStreamType(type)}>
+                        <View style={styles.streamTypeContainer}>
+                            {/* Live Button */}
+                            <TouchableOpacity onPress={() => setStreamType('Live')}>
                                 <View style={styles.streamTypeItem}>
-                                    <Text style={styles.streamTypeText}>{type}</Text>
-                                    {streamType === type && <View style={styles.streamTypeIndicator} />}
+                                    <Text style={styles.streamTypeText}>Live</Text>
+                                    {streamType === 'Live' && <View style={styles.streamTypeIndicator} />}
                                 </View>
                             </TouchableOpacity>
-                        ))}
+
+                            {/* Audio Button */}
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setStreamType('Audio');
+                                    redirect('createaudioroom'); // Replace with your actual screen name
+                                }}
+                            >
+                                <View style={styles.streamTypeItem}>
+                                    <Text style={styles.streamTypeText}>Audio</Text>
+                                    {streamType === 'Audio' && <View style={styles.streamTypeIndicator} />}
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+
                     </View>
                     <View style={styles.termsContainer}>
                         <TermsAndConditions />

@@ -2,8 +2,9 @@ import React, { createContext, useContext, useEffect, useState, useRef } from "r
 import io, { Socket } from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchToken } from "@/controllers/fetchToken";
+import { socketUrl } from "@/services/apiUrl";
 
-const SOCKET_SERVER_URL = "https://backend.dozolive.com";
+const SOCKET_SERVER_URL = socketUrl;
 
 interface SocketContextType {
   socket: Socket | null;
