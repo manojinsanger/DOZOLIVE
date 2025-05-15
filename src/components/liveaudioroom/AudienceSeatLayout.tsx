@@ -3,13 +3,12 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const SeatLayout = ({
+const AudienceSeatLayout = ({
   room,
   roomId,
   userId,
   changeSeat,
   handleToggleMic,
-  handleKickUser,
   handleChangeSeat,
 }: {
   room: any;
@@ -17,7 +16,6 @@ const SeatLayout = ({
   userId: any;
   changeSeat: any;
   handleToggleMic: any;
-  handleKickUser: any;
   handleChangeSeat: any;
 }) => {
   // Render individual seat component with fixed dimensions to prevent layout shifts
@@ -176,19 +174,7 @@ const SeatLayout = ({
                 {user.mic ? 'Mute' : 'Unmute'}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#b0bec5',
-                paddingHorizontal: 8,
-                paddingVertical: 4,
-                borderRadius: 12,
-              }}
-              onPress={() => handleKickUser(user.id)}
-            >
-              <Text style={{ color: '#fff', fontSize: 11, fontWeight: '600' }}>
-                Kick
-              </Text>
-            </TouchableOpacity>
+           
           </View>
         )}
       </TouchableOpacity>
@@ -242,4 +228,4 @@ const styles = {
   },
 };
 
-export default SeatLayout;
+export default AudienceSeatLayout;

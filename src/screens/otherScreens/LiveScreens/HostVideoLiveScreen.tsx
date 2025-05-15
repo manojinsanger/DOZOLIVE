@@ -476,11 +476,8 @@ const HostVideoLiveScreen = () => {
                 <MainContainer3>
                     <ZegoTextureView ref={previewRef} style={styles.preview} />
                     <View style={{ position: 'absolute', top: 200, zIndex: 100 }}>
-
-
                     </View>
                     <View>
-
                     </View>
                 </MainContainer3>
             </View>

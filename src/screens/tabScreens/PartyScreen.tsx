@@ -388,7 +388,7 @@ const PartyScreen: React.FC = () => {
    const fetchData = async () => {
         try {
             setRefreshing(true);
-            const response = await fetch('http://10.0.2.2:3010/api/live/getallaudiorooms', {
+            const response = await fetch('https://dozoapi.com/api/live/getallaudiorooms', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

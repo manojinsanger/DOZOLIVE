@@ -724,7 +724,9 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useUser } from '@/context/UserProvider';
 import { useAudioRoom } from '@/context/AudioRoomSocketProvider';
 import KeyCenter from '@/zegodata/KeyCenter';
-
+import SeatLayout from '@/components/liveaudioroom/SeatLayout';
+import AudienceSeatLayout from '@/components/liveaudioroom/AudienceSeatLayout';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 interface User {
   id: string;
   userName: string;
@@ -741,7 +743,7 @@ const AudienceAudioRoom = () => {
   const navigation = useNavigation();
   const { params } = useRoute();
   const { userAllDetails } = useUser();
-  const { room, socket, joinRoom, leaveRoom, requestCohost, changeSeat, assignCohostAndSeat, removeCohostStatus } = useAudioRoom();
+  const { room, socket, joinRoom, leaveRoom, requestCohost, changeSeat, assignCohostAndSeat, removeCohostStatus, toggleMic } = useAudioRoom();
 
   const roomID = params?.roomDetails?.roomId || 'defaultRoomId';
   const userId = String(userAllDetails.liveId);
@@ -774,12 +776,12 @@ const AudienceAudioRoom = () => {
   }, []);
 
   useEffect(() => {
-    socket?.on('cohostAndSeatAssigned', ({ roomId, users }) => {
-      const updatedUser = users.find((u: User) => u.id === userId);
-      if (updatedUser?.isCohost && updatedUser?.mic) {
-        startPublishingStream();
-      }
-    });
+    // socket?.on('cohostAndSeatAssigned', ({ roomId, users }) => {
+    //   const updatedUser = users.find((u: User) => u.id === userId);
+    //   if (updatedUser?.isCohost && updatedUser?.mic) {
+    //     startPublishingStream();
+    //   }
+    // });
 
     socket?.on('kickedFromRoom', ({ roomId }) => {
       if (roomID === roomId) {
@@ -794,11 +796,22 @@ const AudienceAudioRoom = () => {
     };
   }, [socket]);
 
+  useEffect(() => {
+    const currentUser = room?.users.find((u) => u.id === userId);
+    if (currentUser?.isCohost) {
+      console.log('publishing stream')
+      startPublishingStream(); // Start if user is now a cohost
+    } else {
+      if (engineRef.current) {
+        engineRef.current.stopPublishingStream();
+      }
+    }
+  }, [room?.users.find((u) => u.id === userId), userId]);
   const startPublishingStream = async () => {
     try {
       const engine = engineRef.current;
       if (!engine) return;
-    //   await engine.startPublishingStream(`stream_${userId}`);
+        await engine.startPublishingStream(`stream_${userId}`);
     } catch (err) {
       console.error('Error starting stream:', err);
     }
@@ -925,7 +938,7 @@ const AudienceAudioRoom = () => {
       await removeCohostStatus(roomID, userId);
       Alert.alert('Success', 'Co-host status removed');
       if (engineRef.current) {
-        await engineRef.current.stopPublishingStream(`stream_${userId}`);
+        await engineRef.current.stopPublishingStream();
       }
     } catch (err) {
       console.error('Remove co-host status failed:', err);
@@ -951,6 +964,39 @@ const AudienceAudioRoom = () => {
     setSeatChangeModalVisible(false);
     setSelectedUser(null);
   };
+
+
+  const handleToggleMic = async (targetUserId: string, currentMicStatus: boolean) => {
+    try {
+      await toggleMic(roomID, targetUserId, !currentMicStatus);
+      Alert.alert('Success', `Mic ${currentMicStatus ? 'muted' : 'unmuted'}`);
+      if (targetUserId === userId && engineRef.current) {
+        await engineRef.current.muteMicrophone(currentMicStatus);
+      }
+    } catch (err) {
+      console.error('Toggle mic failed:', err);
+      Alert.alert('Error', 'Failed to toggle mic');
+    }
+  };
+
+
+  useEffect(() => {
+    const currentUser = room?.users.find((u) => u.id === userId);
+
+    if (!currentUser || !engineRef.current) return;
+
+    const shouldPublish = currentUser.isCohost;
+    const micOn = currentUser.mic;
+
+    if (shouldPublish) {
+      engineRef.current.muteMicrophone(!micOn); // true to mute, false to unmute
+    } else {
+      engineRef.current.muteMicrophone(true); // Always mute if not cohost
+    }
+  }, [userId, room?.users.find((u) => u.id === userId)?.mic]);
+
+
+
 
   const handleSeatPress = (seatIndex: number) => {
     const targetSeat = seatIndex + 1;
@@ -1104,6 +1150,33 @@ const AudienceAudioRoom = () => {
 
         <View style={styles.seatContainer}>{renderSeatRows()}</View>
 
+        {/* <View style={styles.seatContainer}>
+          <AudienceSeatLayout
+            room={room}
+            roomId={roomID}
+            userId={userId}
+            changeSeat={changeSeat}
+            handleToggleMic={handleToggleMic}
+            handleChangeSeat={handleChangeSeat}
+          />
+        </View> */}
+        {
+          room?.users.find((u) => u.id === userId)?.isCohost && (
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => handleToggleMic(userId, room?.users.find((u) => u.id === userId)?.mic || false)}
+            >
+
+              <MaterialCommunityIcons
+                name={room?.users.find((u) => u.id === userId)?.mic ? 'microphone' : 'microphone-off'}
+                size={22}
+                color="#fff"
+              />
+
+            </TouchableOpacity>
+          )
+        }
+
         <View style={styles.userListContainer}>
           <Text style={styles.userListTitle}>Audience ({room?.users?.length || 0})</Text>
           <FlatList
@@ -1169,6 +1242,16 @@ const AudienceAudioRoom = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  actionButton: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 100,
+    padding: 8,
+    width: 40,
+    height: 40,
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   backgroundImage: {
     opacity: 0.9,

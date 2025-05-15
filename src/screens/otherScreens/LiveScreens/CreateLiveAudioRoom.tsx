@@ -73,7 +73,7 @@ const CreateAudioRoomScreen = () => {
       } else {
         throw new Error(data.error || 'Failed to create room');
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error creating room:', error);
       Alert.alert(
         'Creation Failed',
@@ -114,7 +114,7 @@ const CreateAudioRoomScreen = () => {
 
           <Text style={styles.label}>Room Image</Text>
           <View style={styles.imageGridContainer}>
-            {roomImages.map((img, index) => (
+            {roomImages.map((img:any, index) => (
               <TouchableOpacity
                 key={index}
                 onPress={() => setSelectedImage(img)}
