@@ -1,3 +1,5 @@
+
+
 // import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 // import { io, Socket } from 'socket.io-client';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,7 +15,8 @@
 //   specialId: string;
 //   seat?: number;
 //   micOn?: boolean;
-//   isCohost?: boolean; // Added isCohost to match backend
+//   isCohost?: boolean;
+//   isHost?: boolean;
 // }
 
 // interface RoomData {
@@ -22,6 +25,7 @@
 //   seats?: number;
 //   isLocked?: boolean;
 //   hostId?: string;
+//   image?: string; // Ensure image is included
 //   users: User[];
 //   cohostRequests?: string[];
 // }
@@ -46,14 +50,14 @@
 //   leaveRoom: (roomId: string, id: string) => void;
 //   requestCohost: (roomId: string, id: string) => void;
 //   acceptCohost: (roomId: string, id: string) => void;
-//   kickUser: (roomId: string, id: string) => void;
+//   kickCohostFromSeat: (roomId: string, id: string) => void;
 //   toggleMic: (roomId: string, id: string, micStatus: boolean) => void;
 //   deleteRoom: (roomId: string) => void;
-//   changeSeat: (roomId: string, id: string, newSeat: number) => void; // Added changeSeat
-
+//   changeSeat: (roomId: string, id: string, newSeat: number) => void;
 //   assignCohostAndSeat: (roomId: string, id: string, newSeat: number) => void;
 //   toggleRoomLock: (roomId: string, isLocked: boolean) => void;
-
+//   changeRoomBackground: (roomId: string, newImage: string) => void; // New
+//   removeCohostStatus: (roomId: string, id: string) => void; // New
 // }
 
 // // Context Setup
@@ -71,7 +75,7 @@
 //   useEffect(() => {
 //     const initialize = async () => {
 //       try {
-//         if (socketRef.current) return; // Avoid reinitializing
+//         if (socketRef.current) return;
 
 //         const storedUser = await AsyncStorage.getItem('fbUser');
 //         const parsedUser = storedUser ? JSON.parse(storedUser) : null;
@@ -131,6 +135,20 @@
 //           }
 //         });
 
+//         newSocket.on('roomBackgroundChanged', ({ roomId, newImage }) => {
+//           console.log(`Room background changed for room ${roomId} to ${newImage}`);
+//           if (roomRef.current?.roomId === roomId) {
+//             setRoom((prev) => (prev ? { ...prev, image: newImage } : prev));
+//           }
+//         });
+
+//         newSocket.on('cohostStatusRemoved', ({ roomId, users }) => {
+//           console.log(`Cohost status removed in room ${roomId}`);
+//           if (roomRef.current?.roomId === roomId) {
+//             setRoom((prev) => (prev ? { ...prev, users } : prev));
+//           }
+//         });
+
 //         setIsLoading(false);
 //       } catch (err) {
 //         console.error('⚠️ Failed to init AudioRoomProvider:', err);
@@ -160,31 +178,23 @@
 
 //   // Actions
 //   const joinRoom = (payload: JoinRoomPayload) => emit('joinRoom', payload);
-
 //   const leaveRoom = (roomId: string, id: string) => emit('leaveRoom', { roomId, id });
-
 //   const requestCohost = (roomId: string, id: string) => emit('requestCohost', { roomId, id });
-
 //   const acceptCohost = (roomId: string, id: string) => emit('acceptCohost', { roomId, id });
-
-//   const kickUser = (roomId: string, id: string) => emit('kickUser', { roomId, id });
-
+//   const kickCohostFromSeat = (roomId: string, id: string) => emit('kickCohostFromSeat', { roomId, id });
 //   const toggleMic = (roomId: string, id: string, micStatus: boolean) =>
 //     emit('toggleCohostMic', { roomId, id, micStatus });
-
 //   const deleteRoom = (roomId: string) => emit('deleteRoom', { roomId });
-
 //   const changeSeat = (roomId: string, id: string, newSeat: number) =>
 //     emit('changeSeat', { roomId, id, newSeat });
-
-//   const assignCohostAndSeat = (roomId: string, id: string, newSeat: number) => {
-//     socket?.emit('assignCohostAndSeat', { roomId, id, newSeat });
-//   };
-
-//   const toggleRoomLock = (roomId: string, isLocked: boolean) => {
-//     socket?.emit('toggleRoomLock', { roomId, isLocked });
-//   };
-
+//   const assignCohostAndSeat = (roomId: string, id: string, newSeat: number) =>
+//     emit('assignCohostAndSeat', { roomId, id, newSeat });
+//   const toggleRoomLock = (roomId: string, isLocked: boolean) =>
+//     emit('toggleRoomLock', { roomId, isLocked });
+//   const changeRoomBackground = (roomId: string, newImage: string) =>
+//     emit('changeRoomBackground', { roomId, newImage }); // New
+//   const removeCohostStatus = (roomId: string, id: string) =>
+//     emit('removeCohostStatus', { roomId, id }); // New
 
 //   return (
 //     <AudioRoomContext.Provider
@@ -199,12 +209,14 @@
 //         leaveRoom,
 //         requestCohost,
 //         acceptCohost,
-//         kickUser,
+//         kickCohostFromSeat,
 //         toggleMic,
 //         deleteRoom,
-//         changeSeat, // Added changeSeat
+//         changeSeat,
 //         assignCohostAndSeat,
-//         toggleRoomLock
+//         toggleRoomLock,
+//         changeRoomBackground, // New
+//         removeCohostStatus, // New
 //       }}
 //     >
 //       {children}
@@ -224,6 +236,7 @@ import { io, Socket } from 'socket.io-client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { socketUrl } from '@/services/apiUrl';
 import { fetchToken } from '@/controllers/fetchToken';
+import { Alert } from 'react-native';
 
 // Types
 interface User {
@@ -233,7 +246,7 @@ interface User {
   level: number;
   specialId: string;
   seat?: number;
-  micOn?: boolean;
+  mic?: boolean; // Updated to match backend
   isCohost?: boolean;
   isHost?: boolean;
 }
@@ -244,7 +257,7 @@ interface RoomData {
   seats?: number;
   isLocked?: boolean;
   hostId?: string;
-  image?: string; // Ensure image is included
+  image?: string;
   users: User[];
   cohostRequests?: string[];
 }
@@ -270,13 +283,15 @@ interface AudioRoomContextType {
   requestCohost: (roomId: string, id: string) => void;
   acceptCohost: (roomId: string, id: string) => void;
   kickCohostFromSeat: (roomId: string, id: string) => void;
+  kickUser: (roomId: string, id: string) => void; // New
   toggleMic: (roomId: string, id: string, micStatus: boolean) => void;
   deleteRoom: (roomId: string) => void;
   changeSeat: (roomId: string, id: string, newSeat: number) => void;
   assignCohostAndSeat: (roomId: string, id: string, newSeat: number) => void;
   toggleRoomLock: (roomId: string, isLocked: boolean) => void;
-  changeRoomBackground: (roomId: string, newImage: string) => void; // New
-  removeCohostStatus: (roomId: string, id: string) => void; // New
+  changeRoomBackground: (roomId: string, newImage: string) => void;
+  removeCohostStatus: (roomId: string, id: string) => void;
+  toggleChatMute: (roomId: string, id: string) => void;
 }
 
 // Context Setup
@@ -368,6 +383,19 @@ export const AudioRoomProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           }
         });
 
+        newSocket.on('userKickedFromCohostSeat', ({ roomId, users }) => {
+          console.log(`User kicked from room ${roomId}`);
+          if (roomRef.current?.roomId === roomId) {
+            setRoom((prev) => (prev ? { ...prev, users } : prev));
+          }
+        });
+
+        newSocket.on('hostLeft', ({ roomId, message }) => {
+          console.log(`Host left notification: ${message}`);
+          // Display a notification (e.g., using a UI library like Toastify or alert)
+          Alert.alert(message); // Simple example, replace with your notification system
+          // Optionally, redirect users or update UI
+        });
         setIsLoading(false);
       } catch (err) {
         console.error('⚠️ Failed to init AudioRoomProvider:', err);
@@ -401,6 +429,7 @@ export const AudioRoomProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const requestCohost = (roomId: string, id: string) => emit('requestCohost', { roomId, id });
   const acceptCohost = (roomId: string, id: string) => emit('acceptCohost', { roomId, id });
   const kickCohostFromSeat = (roomId: string, id: string) => emit('kickCohostFromSeat', { roomId, id });
+  const kickUser = (roomId: string, id: string) => emit('kickUser', { roomId, id }); // New
   const toggleMic = (roomId: string, id: string, micStatus: boolean) =>
     emit('toggleCohostMic', { roomId, id, micStatus });
   const deleteRoom = (roomId: string) => emit('deleteRoom', { roomId });
@@ -411,9 +440,11 @@ export const AudioRoomProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const toggleRoomLock = (roomId: string, isLocked: boolean) =>
     emit('toggleRoomLock', { roomId, isLocked });
   const changeRoomBackground = (roomId: string, newImage: string) =>
-    emit('changeRoomBackground', { roomId, newImage }); // New
+    emit('changeRoomBackground', { roomId, newImage });
   const removeCohostStatus = (roomId: string, id: string) =>
-    emit('removeCohostStatus', { roomId, id }); // New
+    emit('removeCohostStatus', { roomId, id });
+  const toggleChatMute = (roomId: string, id: string) =>
+    emit('toggleChatMute', { roomId, id });
 
   return (
     <AudioRoomContext.Provider
@@ -429,13 +460,15 @@ export const AudioRoomProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         requestCohost,
         acceptCohost,
         kickCohostFromSeat,
+        kickUser, // New
         toggleMic,
         deleteRoom,
         changeSeat,
         assignCohostAndSeat,
         toggleRoomLock,
-        changeRoomBackground, // New
-        removeCohostStatus, // New
+        changeRoomBackground,
+        removeCohostStatus,
+        toggleChatMute
       }}
     >
       {children}

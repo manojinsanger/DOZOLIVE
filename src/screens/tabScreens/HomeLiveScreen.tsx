@@ -80,6 +80,8 @@ const HomeScreen: React.FC = () => {
         <View style={styles.container}>
           <Header appName="Dozo Live!" onSearchPress={() => setIsSearchVisible(!isSearchVisible)} />
 
+          <LottieView source={require("../../assets/animations/photoFrame2.json")} autoPlay loop style={{ width: 200, height: 200 }} />
+
           <TouchableOpacity onPress={() => redirect('joinStream')}>
             <Text>Join Live</Text>
           </TouchableOpacity>
