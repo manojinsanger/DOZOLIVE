@@ -1,5 +1,6 @@
 import Header from '@/components/common/Header';
 import MainContainer from '@/components/common/mainContainers/MainContainer';
+import GoLiveBtnAudioRoom from '@/components/homePage/GoLiveBtnAudioRoom';
 import PartyHeader from '@/components/homePage/PartyHeader';
 import PartHeader from '@/components/homePage/PartyHeader';
 import Banner from '@/components/party/Banner';
@@ -415,6 +416,9 @@ const PartyScreen: React.FC = () => {
         <MainContainer>
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={styles.container}>
+                    
+                        <GoLiveBtnAudioRoom/>
+                    
                     <PartyHeader />
                     <ScrollView contentContainerStyle={styles.scrollContent} refreshControl={
                             <RefreshControl

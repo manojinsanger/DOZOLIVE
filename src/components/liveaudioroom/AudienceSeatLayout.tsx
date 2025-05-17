@@ -1,57 +1,31 @@
-import { scaleHeight, scaleWidth } from '@/constants/scaling';
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { scaleHeight, scaleWidth } from '@/constants/scaling'; // Assuming this is your scaling utility
 
-const AudienceSeatLayout = ({
-  room,
-  roomId,
-  userId,
-  changeSeat,
-  handleToggleMic,
-  handleChangeSeat,
-}: {
-  room: any;
-  roomId: any;
-  userId: any;
-  changeSeat: any;
-  handleToggleMic: any;
-  handleChangeSeat: any;
-}) => {
-  // Render individual seat component with fixed dimensions to prevent layout shifts
-  const renderSeat = (user: any, seatIndex: any) => {
+interface SeatLayoutProps {
+  room: { users: any[]; seats: number } | null;
+  handleSeatPress: (seatIndex: number) => void;
+}
+
+const AudienceSeatLayout: React.FC<SeatLayoutProps> = ({ room, handleSeatPress }) => {
+  const renderSeat = (user: any | null, seatIndex: number) => {
     const isOccupied = !!user;
-    const currentUser = room?.users.find((u: any) => u.id === userId);
-    const canChangeSeat = currentUser?.isCohost || currentUser?.isHost;
-    const isHost = currentUser?.isHost;
 
     return (
       <TouchableOpacity
         style={{
-          width: scaleWidth(70), // Fixed width to prevent layout shifts
+          width: scaleWidth(70), // Fixed width to match SeatLayout
           height: scaleHeight(100), // Fixed height to accommodate all elements
           alignItems: 'center',
           justifyContent: 'flex-start',
           margin: 8,
           opacity: room === null ? 0.5 : 1,
         }}
-        onPress={() => {
-          if (!canChangeSeat) {
-            Alert.alert('Permission Denied', 'You must be a co-host or host to change seats.');
-            return;
-          }
-          const targetSeat = seatIndex + 1;
-          const isSeatOccupied = room?.users.some((u: any) => u.seat === targetSeat);
-          if (isSeatOccupied) {
-            handleChangeSeat(user);
-          } else {
-            changeSeat(roomId, userId, targetSeat);
-            Alert.alert('Success', `Moved to Seat ${targetSeat}`);
-          }
-        }}
+        onPress={() => handleSeatPress(seatIndex)}
         disabled={room === null}
       >
-        {/* Avatar container with fixed position for mic indicator */}
+        {/* Avatar container */}
         <View
           style={{
             width: scaleWidth(70),
@@ -84,7 +58,7 @@ const AudienceSeatLayout = ({
             />
           ) : (
             <Image
-              source={require('../../assets/images/liveaudio/seat.png')}
+              source={require('../../assets/images/liveaudio/seat.png')} // Ensure this asset exists
               style={{
                 width: scaleWidth(40),
                 height: scaleWidth(40),
@@ -94,7 +68,7 @@ const AudienceSeatLayout = ({
           )}
         </View>
 
-        {/* Mic status indicator (positioned absolutely to prevent layout shifts) */}
+        {/* Mic status indicator */}
         {isOccupied && (
           <View
             style={{
@@ -125,7 +99,7 @@ const AudienceSeatLayout = ({
           </View>
         )}
 
-        {/* User info container with fixed height to prevent layout shifts */}
+        {/* User info container */}
         <View
           style={{
             height: 70,
@@ -146,55 +120,49 @@ const AudienceSeatLayout = ({
           >
             {isOccupied ? user.userName : `Seat ${seatIndex + 1}`}
           </Text>
-        </View>
 
-        {/* Control buttons with fixed layout */}
-        {isOccupied && isHost && !user.isHost && user.isCohost && (
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              gap: 6,
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-            }}
-          >
-            <TouchableOpacity
+          {/* Host and Co-host badges */}
+          {isOccupied && user.isHost && (
+            <View
               style={{
-                backgroundColor: user.mic ? '#d32f2f' : '#00c853',
-                paddingHorizontal: 8,
-                paddingVertical: 4,
-                borderRadius: 12,
+                backgroundColor: '#FF4500',
+                borderRadius: 5,
+                paddingHorizontal: 4,
+                paddingVertical: 2,
+                marginTop: 4,
               }}
-              onPress={() => handleToggleMic(user.id, user.mic)}
             >
-              <Text style={{ color: '#fff', fontSize: 11, fontWeight: '600' }}>
-                {user.mic ? 'Mute' : 'Unmute'}
-              </Text>
-            </TouchableOpacity>
-           
-          </View>
-        )}
+              <Text style={{ fontSize: 8, color: '#fff', fontWeight: '600' }}>Host</Text>
+            </View>
+          )}
+          {isOccupied && user.isCohost && !user.isHost && (
+            <View
+              style={{
+                backgroundColor: '#FFD700',
+                borderRadius: 5,
+                paddingHorizontal: 4,
+                paddingVertical: 2,
+                marginTop: 4,
+              }}
+            >
+              <Text style={{ fontSize: 8, color: '#333', fontWeight: '600' }}>Co-host</Text>
+            </View>
+          )}
+        </View>
       </TouchableOpacity>
     );
   };
 
-  // Render seats in a visually appealing grid layout
   const renderSeatGrid = () => {
-    const seats = room?.seats || 8;
-    const users = (room?.users || []).filter(
-      (user: any) => user.isCohost === true || user.isHost === true
-    );
+    const seats = room?.seats;
+    const users = (room?.users || []).filter((user) => user.isCohost === true || user.isHost === true);
 
     const seatAssignments = Array(seats)
       .fill(null)
       .map((_, index) => {
-        return users.find((u: any) => u.seat === index + 1) || null;
+        return users.find((u) => u.seat === index + 1) || null;
       });
 
-    // Create more natural circular seating arrangement
     return (
       <View style={{ alignItems: 'center', paddingVertical: 10 }}>
         {/* Top row - 2 seats */}
@@ -202,15 +170,22 @@ const AudienceSeatLayout = ({
           {seatAssignments.slice(0, 2).map((user, index) => renderSeat(user, index))}
         </View>
 
-        {/* Middle row - 4 seats */}
-        <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 5 }}>
-          {seatAssignments.slice(2, 6).map((user, index) => renderSeat(user, index + 2))}
-        </View>
-
-        {/* Bottom row - 2 seats */}
-        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-          {seatAssignments.slice(6, 8).map((user, index) => renderSeat(user, index + 6))}
-        </View>
+        {/* Middle row(s) - 4 seats each */}
+        {seatAssignments.slice(2).length > 0 && (
+          <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 5 }}>
+            {seatAssignments.slice(2, 6).map((user, index) => renderSeat(user, index + 2))}
+          </View>
+        )}
+        {seatAssignments.slice(6).length > 0 && (
+          <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 5 }}>
+            {seatAssignments.slice(6, 10).map((user, index) => renderSeat(user, index + 6))}
+          </View>
+        )}
+        {seatAssignments.slice(10).length > 0 && (
+          <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 5 }}>
+            {seatAssignments.slice(10, 14).map((user, index) => renderSeat(user, index + 10))}
+          </View>
+        )}
       </View>
     );
   };
@@ -218,14 +193,13 @@ const AudienceSeatLayout = ({
   return <View style={{ width: '100%' }}>{renderSeatGrid()}</View>;
 };
 
-// Styles
-const styles = {
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
   },
-};
+});
 
 export default AudienceSeatLayout;

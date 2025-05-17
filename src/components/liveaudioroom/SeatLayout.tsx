@@ -197,7 +197,7 @@ const SeatLayout = ({
 
   // Render seats in a visually appealing grid layout
   const renderSeatGrid = () => {
-    const seats = room?.seats || 8;
+    const seats = room?.seats;
     const users = (room?.users || []).filter(
       (user: any) => user.isCohost === true || user.isHost === true
     );
@@ -223,7 +223,11 @@ const SeatLayout = ({
 
         {/* Bottom row - 2 seats */}
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-          {seatAssignments.slice(6, 8).map((user, index) => renderSeat(user, index + 6))}
+          {seatAssignments.slice(6, 10).map((user, index) => renderSeat(user, index + 6))}
+        </View>
+        {/* Bottom row - 2 seats */}
+        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          {seatAssignments.slice(10, 14).map((user, index) => renderSeat(user, index + 10))}
         </View>
       </View>
     );
