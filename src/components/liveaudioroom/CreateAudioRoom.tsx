@@ -1,87 +1,89 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Image,
-  ScrollView,
-  Alert,
   ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useUser } from '@/context/UserProvider';
+import { BlurView } from '@react-native-community/blur';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { BlurView } from '@react-native-community/blur';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
-
-interface CreateAudioRoomScreenProps {
-  onRoomCreated: (roomId: string) => void;
-  roomId:string;
+interface CreateAudioRoomProps {
+  roomId: string;
+  roomTitle: string;
+  setRoomTitle: (value: string) => void;
+  selectedSeats: number;
+  setSelectedSeats: (value: number) => void;
+  isRoomLocked: boolean;
+  setIsRoomLocked: (value: boolean) => void;
+  onCreateRoom: () => void;
+  isLoading: boolean;
 }
 
-const CreateAudioRoom: React.FC<CreateAudioRoomScreenProps> = ({ onRoomCreated ,roomId}) => {
-  const { userAllDetails } = useUser();
-  const [roomTitle, setRoomTitle] = useState('');
-  const [selectedSeats, setSelectedSeats] = useState(6);
-  const [isRoomLocked, setIsRoomLocked] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+const CreateAudioRoom: React.FC<CreateAudioRoomProps> = ({
+  roomId,
+  roomTitle,
+  setRoomTitle,
+  selectedSeats,
+  setSelectedSeats,
+  isRoomLocked,
+  setIsRoomLocked,
+  onCreateRoom,
+  isLoading,
+}) => {
+  const seatOptions = [10, 14];
 
-  const seatOptions = [ 10, 14];
-  const roomImages = [
-    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3',
-    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3',
-  ];
+  // Handle room title input
+  const handleTitleChange = useCallback(
+    (text: string) => {
+      setRoomTitle(text);
+    },
+    [setRoomTitle]
+  );
 
-  const handleCreateRoom = async () => {
-    if (!roomTitle.trim()) {
-      Alert.alert('Error', 'Please enter a title for your audio room');
-      return;
-    }
+  // Render seat option buttons
+  const renderSeatOption = useCallback(
+    ({ seats }: { seats: number }) => (
+      <TouchableOpacity
+        style={[styles.seatOption, selectedSeats === seats && styles.selectedSeat]}
+        onPress={() => setSelectedSeats(seats)}
+      >
+        <View style={styles.seatContent}>
+          <MaterialCommunityIcons
+            name="account-group"
+            size={22}
+            color={selectedSeats === seats ? '#FFFFFF' : '#B39DDB'}
+          />
+          <Text style={[styles.seatText, selectedSeats === seats && styles.selectedSeatText]}>
+            {seats} Seats
+          </Text>
+        </View>
+      </TouchableOpacity>
+    ),
+    [selectedSeats]
+  );
 
-    if (!userAllDetails?.liveId) {
-      Alert.alert('Error', 'User information is missing. Please try again.');
-      return;
-    }
+  // Memoized seat options rendering
+  const seatOptionsRender = useMemo(
+    () =>
+      seatOptions.map((seats) => (
+        <React.Fragment key={seats}>{renderSeatOption({ seats })}</React.Fragment>
+      )),
+    [renderSeatOption]
+  );
 
-    setIsLoading(true);
-
-    try {
-
-      const roomData = {
-        roomId: roomId,
-        title: roomTitle.trim(),
-        seats: selectedSeats,
-        isLocked: isRoomLocked,
-        hostId: String(userAllDetails.liveId),
-        hostName: userAllDetails.name || 'dozolive',
-        image: selectedImage || roomImages[0],
-        tags: [],
-      };
-
-      const response = await fetch('http://10.0.2.2:3010/api/live/createaudiolive', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(roomData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        onRoomCreated(true);
-      } else {
-        throw new Error(data.error || 'Failed to create room');
-      }
-    } catch (error: any) {
-      console.error('Error creating room:', error);
-      Alert.alert('Error', `Unable to create audio room: ${error.message || 'Please try again.'}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Header component
+  const Header = React.memo(() => (
+    <Animated.View style={styles.headerContainer}>
+      <Text style={styles.title}>Create Audio Room</Text>
+      <Text style={styles.subtitle}>Connect with your audience in real-time</Text>
+    </Animated.View>
+  ));
 
   return (
     <LinearGradient
@@ -90,77 +92,23 @@ const CreateAudioRoom: React.FC<CreateAudioRoomScreenProps> = ({ onRoomCreated ,
       end={{ x: 0.8, y: 0.9 }}
       style={styles.container}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <Animated.View entering={FadeIn.duration(600)} style={styles.headerContainer}>
-          <Text style={styles.title}>Create Audio Room</Text>
-          <Text style={styles.subtitle}>Connect with your audience in real-time</Text>
-        </Animated.View>
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <Header />
 
         <View style={styles.formContainer}>
           <Text style={styles.label}>Room Title</Text>
           <TextInput
             style={styles.input}
             value={roomTitle}
-            onChangeText={setRoomTitle}
+            onChangeText={handleTitleChange}
             placeholder="Give your room an engaging title..."
             maxLength={30}
             placeholderTextColor="rgba(255,255,255,0.5)"
-            editable={!isLoading}
           />
           <Text style={styles.charCount}>{roomTitle.length}/30</Text>
 
-          <Text style={styles.label}>Room Image</Text>
-          <View style={styles.imageGridContainer}>
-            {roomImages.map((img, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => setSelectedImage(img)}
-                style={styles.imageWrapper}
-                disabled={isLoading}
-              >
-                <Image source={{ uri: img }} style={styles.image} />
-                {selectedImage === img && (
-                  <View style={styles.selectedOverlay}>
-                    <MaterialCommunityIcons name="check-circle" size={24} color="#6200EA" />
-                  </View>
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-
           <Text style={styles.label}>Seat Capacity</Text>
-          <View style={styles.seatOptionsContainer}>
-            {seatOptions.map((seats) => (
-              <TouchableOpacity
-                key={seats}
-                style={[
-                  styles.seatOption,
-                  selectedSeats === seats && styles.selectedSeat,
-                ]}
-                onPress={() => setSelectedSeats(seats)}
-                disabled={isLoading}
-              >
-                <View style={styles.seatContent}>
-                  <MaterialCommunityIcons
-                    name="account-group"
-                    size={22}
-                    color={selectedSeats === seats ? '#FFFFFF' : '#B39DDB'}
-                  />
-                  <Text
-                    style={[
-                      styles.seatText,
-                      selectedSeats === seats && styles.selectedSeatText,
-                    ]}
-                  >
-                    {seats} Seats
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <View style={styles.seatOptionsContainer}>{seatOptionsRender}</View>
 
           <View style={styles.divider} />
 
@@ -172,7 +120,6 @@ const CreateAudioRoom: React.FC<CreateAudioRoomScreenProps> = ({ onRoomCreated ,
             <TouchableOpacity
               style={[styles.switch, isRoomLocked ? styles.switchOn : styles.switchOff]}
               onPress={() => setIsRoomLocked(!isRoomLocked)}
-              disabled={isLoading}
             >
               <View style={[styles.switchToggle, isRoomLocked && styles.switchToggleOn]}>
                 <MaterialCommunityIcons
@@ -186,7 +133,7 @@ const CreateAudioRoom: React.FC<CreateAudioRoomScreenProps> = ({ onRoomCreated ,
 
           <TouchableOpacity
             style={[styles.createButton, !roomTitle.trim() && styles.createButtonDisabled]}
-            onPress={handleCreateRoom}
+            onPress={onCreateRoom}
             disabled={!roomTitle.trim() || isLoading}
           >
             <LinearGradient
@@ -277,50 +224,13 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginBottom: 16,
   },
-  imageGridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  imageWrapper: {
-    width: '48%',
-    height: 120,
-    borderRadius: 16,
-    overflow: 'hidden',
-    marginBottom: 15,
-    position: 'relative',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  selectedOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: '#6200EA',
-    borderRadius: 16,
-  },
   seatOptionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 24,
   },
   seatOption: {
-    width: '32%',
+    width: '48%',
     height: 60,
     borderRadius: 16,
     backgroundColor: 'rgba(255,255,255,0.08)',
@@ -340,7 +250,7 @@ const styles = StyleSheet.create({
   seatText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#B39DDB',
+    color: 'rgba(255,255,255,0.7)',
     marginLeft: 8,
     fontFamily: 'Poppins-SemiBold',
   },
@@ -455,4 +365,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateAudioRoom;
+export default React.memo(CreateAudioRoom);

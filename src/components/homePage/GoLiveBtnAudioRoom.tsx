@@ -9,7 +9,7 @@ const GoLiveBtnAudioRoom = () => {
   return (
     <TouchableOpacity
       style={styles.floatingButton}
-      onPress={() => redirect('createaudioroom')}
+      onPress={() => redirect('audioscreen')}
     >
       <LinearGradient
         colors={[customColors.primary, customColors.secondary]}

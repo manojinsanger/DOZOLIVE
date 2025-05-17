@@ -14,7 +14,6 @@ import {
     scaleFont,
     fullWidth,
 } from '../../../constants/scaling';
-import { useSocket } from '@/context/SocketProvider';
 import CustomHeader from '@/components/profile/CustomHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import MainContainer from '@/components/common/mainContainers/MainContainer';
@@ -44,7 +43,7 @@ const streamData: StreamSummaryData = {
 };
 
 const LiveStreamEndScreen: React.FC = () => {
-    const { user } = useSocket();
+
     return (
         <MainContainer>
             <SafeAreaView style={styles.container}>
@@ -55,10 +54,10 @@ const LiveStreamEndScreen: React.FC = () => {
                     {/* Profile Section */}
                     <View style={styles.profileSection}>
                         <View style={styles.profileImageContainer}>
-                            <Image
+                            {/* <Image
                                 source={{ uri: user.profileImage }}
                                 style={styles.profileImage}
-                            />
+                            /> */}
                         </View>
                         <ThemedText style={styles.username}>{streamData.username}</ThemedText>
                         <ThemedText style={styles.liveEndedText}>Live ended</ThemedText>
