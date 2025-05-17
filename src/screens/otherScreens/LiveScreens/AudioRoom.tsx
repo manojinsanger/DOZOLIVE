@@ -584,6 +584,7 @@ const AudioRoom: React.FC = () => {
               roomId={roomId}
               userId={userId}
               changeSeat={changeSeat}
+              selectedSeats={selectedSeats}
               handleToggleMic={handleToggleMic}
               handleKickUser={handleKickUser}
               handleChangeSeat={handleChangeSeat}

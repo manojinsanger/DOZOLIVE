@@ -106,6 +106,10 @@ import UpdatePostScreen from '@/components/posts_related/UpdatePostScreen';
 import AudienceAudioRoom from '@/screens/otherScreens/LiveScreens/AudienceAudioRoom';
 import CreateAudioRoomScreen from '@/screens/otherScreens/LiveScreens/CreateLiveAudioRoom';
 import { AudioRoomProvider } from '@/context/AudioRoomSocketProvider'; // Adjust the import path
+import LiveAudioRoomPage from '@/screens/otherScreens/LiveScreens/ZegoAudiRoom';
+import HomePage from '@/components/live/zegoAudioRoom.js/HomePage';
+import HostPage from '@/components/live/zegoAudioRoom.js/HostPage';
+import AudiencePage from '@/components/live/zegoAudioRoom.js/AudiencePaeg';
 
 export type MainStackParamList = {
     Tabs: undefined;
@@ -311,6 +315,15 @@ export default function MainStackNavigator() {
                     <Stack.Screen name="audioscreen" component={AudioRoom} />
                     <Stack.Screen name="audienceaudioroom" component={AudienceAudioRoom} />
                     <Stack.Screen name="createaudioroom" component={CreateAudioRoomScreen} />
+                    <Stack.Screen name="zegoaudioroom" component={HomePage} />
+                    <Stack.Screen name="hostpage" component={HostPage} />
+                    <Stack.Screen name="audiencepage" component={AudiencePage} />
+
+
+
+
+
+
                 </Stack.Navigator>
             </AudioRoomProvider>
         </UserProvider>

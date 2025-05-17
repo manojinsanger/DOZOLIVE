@@ -11,6 +11,7 @@ const SeatLayout = ({
   handleToggleMic,
   handleKickUser,
   handleChangeSeat,
+  selectedSeats
 }: {
   room: any;
   roomId: any;
@@ -19,6 +20,7 @@ const SeatLayout = ({
   handleToggleMic: any;
   handleKickUser: any;
   handleChangeSeat: any;
+  selectedSeats:any,
 }) => {
   // Render individual seat component with fixed dimensions to prevent layout shifts
   const renderSeat = (user: any, seatIndex: any) => {
@@ -195,9 +197,11 @@ const SeatLayout = ({
     );
   };
 
+  // console.log(selectedSeats)
+
   // Render seats in a visually appealing grid layout
   const renderSeatGrid = () => {
-    const seats = room?.seats;
+    const seats = room?.seats || selectedSeats;
     const users = (room?.users || []).filter(
       (user: any) => user.isCohost === true || user.isHost === true
     );
